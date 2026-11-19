@@ -25,6 +25,19 @@ _COOKIE_FIELDS = ("name", "value", "domain", "path", "expires", "httpOnly", "sec
 _LOCK_TIMEOUT = 900  # detik menunggu profil tidak dipakai proses lain
 
 
+def _is_termux() -> bool:
+    """Deteksi Termux/Android (Playwright Chromium tidak tersedia di sana)."""
+    prefix = os.environ.get("PREFIX", "")
+    if "com.termux" in prefix:
+        return True
+    try:
+        if "android" in os.uname().release.lower():
+            return True
+    except Exception:
+        pass
+    return False
+
+
 def pastikan_chromium() -> str:
     """Pastikan chromium milik Playwright terunduh; unduh otomatis bila belum ada.
 
@@ -32,6 +45,11 @@ def pastikan_chromium() -> str:
     setelah ``pip install imgcli``, pemakaian pertama langsung jalan.
     Mengembalikan path executable chromium.
     """
+    if _is_termux():
+        raise RuntimeError(
+            "mode web (Playwright Chromium) tidak tersedia di Termux/Android — "
+            "gunakan API resmi: export GEMINI_API_KEY=... lalu `imgcli --api ...`"
+        )
     from playwright.sync_api import sync_playwright
 
     with sync_playwright() as p:

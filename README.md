@@ -17,14 +17,30 @@ Two backends, one interface:
 
 ## Install
 
-**One line** (Linux/macOS, needs Python ≥ 3.11):
+**One line** (Linux/macOS/Termux, needs Python ≥ 3.11 and curl+tar — no git required):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/azisn2102/imgcli/main/install.sh | bash
 ```
 
-The installer finds a suitable Python, installs `imgcli` (via `pipx` if
-available, else `pip --user`) and pre-downloads Chromium. After it finishes:
+The installer checks its environment (platform, network, Python ≥ 3.11),
+installs `imgcli` from the **pinned release tarball** (via `pipx` if available,
+else `pip`), and pre-downloads Chromium. Useful overrides:
+
+```bash
+IMGCLI_NO_BROWSER=1 ... | bash   # skip Chromium (API-only install)
+IMGCLI_VERSION=v2.1.1 ... | bash  # install a different release tag
+```
+
+**Termux / Android:** the `web` backend (Playwright Chromium) does not exist
+there, so the installer skips Chromium automatically — use the official API:
+
+```bash
+export GEMINI_API_KEY=...
+imgcli --api "a red apple, photorealistic"
+```
+
+After installing on Linux/macOS:
 
 ```bash
 imgcli login    # sign in to Google once (free web mode)
@@ -148,6 +164,18 @@ keepalive.sh        session-refresh daemon for headless servers
 install.sh          one-line installer (curl | bash)
 tests/              offline tests (no API calls)
 ```
+
+## Troubleshooting
+
+- **Termux/Android: `mode web (Playwright Chromium) tidak tersedia`** — expected:
+  Android has no Chromium build for Playwright. Use `imgcli --api` with
+  `GEMINI_API_KEY` instead.
+- **`curl | tar` fails** — `pkg install curl tar` (Termux) or your package manager.
+- **Chromium download skipped/failed** — retry with `imgcli setup` (Linux/macOS),
+  or install fully without Chromium: `IMGCLI_NO_BROWSER=1` and use `--api`.
+- **`imgcli` not found after install** — add the printed bin directory to PATH:
+  `export PATH="$HOME/.local/bin:$PATH"`.
+- **Google session expired** — run `imgcli login` again.
 
 ## License
 

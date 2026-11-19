@@ -26,16 +26,15 @@ _LOCK_TIMEOUT = 900  # detik menunggu profil tidak dipakai proses lain
 
 
 def _is_termux() -> bool:
-    """Deteksi Termux/Android (Playwright Chromium tidak tersedia di sana)."""
+    """Deteksi Termux saja (Playwright Chromium tidak tersedia di sana).
+
+    Sekedar kernel Android bukan alasan (userland Linux biasa tetap bisa
+    menjalankan Chromium), jadi hanya cek penanda khas Termux.
+    """
     prefix = os.environ.get("PREFIX", "")
     if "com.termux" in prefix:
         return True
-    try:
-        if "android" in os.uname().release.lower():
-            return True
-    except Exception:
-        pass
-    return False
+    return os.path.isdir("/data/data/com.termux/files/usr")
 
 
 def pastikan_chromium() -> str:

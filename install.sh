@@ -8,12 +8,12 @@
 #   3) pre-downloads Chromium (skipped on Termux/Android and when IMGCLI_NO_BROWSER=1)
 #
 # Environment overrides:
-#   IMGCLI_VERSION=v2.1.1   install a different release tag
+#   IMGCLI_VERSION=v2.1.2   install a different release tag
 #   IMGCLI_NO_BROWSER=1     skip the Chromium download (API-only install)
 set -euo pipefail
 
 REPO="https://github.com/azisn2102/imgcli"
-VERSION="${IMGCLI_VERSION:-v2.1.1}"
+VERSION="${IMGCLI_VERSION:-v2.1.2}"
 TARBALL="$REPO/archive/refs/tags/${VERSION}.tar.gz"
 
 say()  { printf '\033[1;34m==>\033[0m %s\n' "$*"; }
@@ -21,10 +21,10 @@ warn() { printf '\033[1;33mwarning:\033[0m %s\n' "$*" >&2; }
 die()  { printf '\033[1;31merror:\033[0m %s\n' "$*" >&2; exit 1; }
 
 is_termux() {
+  # Termux saja (PREFIX selalu diset Termux), bukan sekadar kernel Android:
+  # userland Linux biasa di atas kernel Android tetap bisa menjalankan Chromium.
   case "${PREFIX:-}" in *com.termux*) return 0 ;; esac
-  case "$(uname -o 2>/dev/null || true)$(uname -r 2>/dev/null || true)" in
-    *[Aa]ndroid*) return 0 ;;
-  esac
+  [ -d /data/data/com.termux/files/usr ] && return 0
   return 1
 }
 

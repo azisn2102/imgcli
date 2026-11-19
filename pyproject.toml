@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "imgcli"
+version = "2.0.0"
+description = "Generate and edit AI images with Google Gemini (Nano Banana) from the command line."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "AzisSN 2102" }]
+keywords = ["gemini", "nano-banana", "image-generation", "cli", "ai"]
+dependencies = [
+    "playwright>=1.40",
+]
+
+[project.optional-dependencies]
+dev = ["ruff>=0.5", "pytest>=8"]
+
+[project.scripts]
+imgcli = "imgcli.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/azisn2102/imgcli"
+Repository = "https://github.com/azisn2102/imgcli"
+Issues = "https://github.com/azisn2102/imgcli/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+ignore = ["BLE001", "S110", "S112", "PYI034"]

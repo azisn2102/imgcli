@@ -1,0 +1,29 @@
+# session credentials — NEVER commit these
+storage_state.json
+storage_state.old.json
+storage_state*.json
+chrome-profile/
+chrome-flow/
+
+# build / packaging
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+
+# tooling caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# generated output
+output/
+*.log
+
+# local backups / scratch
+*.bak
+*.bak-*

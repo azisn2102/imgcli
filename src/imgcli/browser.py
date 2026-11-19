@@ -11,6 +11,8 @@ from __future__ import annotations
 import fcntl
 import json
 import os
+import subprocess
+import sys
 import time
 from pathlib import Path
 
@@ -21,6 +23,34 @@ CHROME_UA = (
 
 _COOKIE_FIELDS = ("name", "value", "domain", "path", "expires", "httpOnly", "secure", "sameSite")
 _LOCK_TIMEOUT = 900  # detik menunggu profil tidak dipakai proses lain
+
+
+def pastikan_chromium() -> str:
+    """Pastikan chromium milik Playwright terunduh; unduh otomatis bila belum ada.
+
+    Dipanggil sebelum browser dibuka supaya instalasi cukup satu langkah:
+    setelah ``pip install imgcli``, pemakaian pertama langsung jalan.
+    Mengembalikan path executable chromium.
+    """
+    from playwright.sync_api import sync_playwright
+
+    with sync_playwright() as p:
+        exe = p.chromium.executable_path
+    if exe and os.path.exists(exe):
+        return exe
+    print(
+        "playwright chromium belum terpasang — mengunduh sekarang "
+        "(sekali saja, ±170MB)...",
+        file=sys.stderr,
+    )
+    subprocess.check_call([sys.executable, "-m", "playwright", "install", "chromium"])
+    with sync_playwright() as p:
+        exe = p.chromium.executable_path
+    if not exe or not os.path.exists(exe):
+        raise RuntimeError(
+            "unduhan chromium gagal — jalankan manual: playwright install chromium"
+        )
+    return exe
 
 
 def _args() -> list[str]:
@@ -52,6 +82,7 @@ def launch(profile_dir, headless=None, viewport=(1280, 900), user_agent=CHROME_U
     """Start a persistent browser context. Returns (playwright, context, headless_used)."""
     from playwright.sync_api import sync_playwright
 
+    pastikan_chromium()
     profile_dir = Path(profile_dir)
     profile_dir.mkdir(parents=True, exist_ok=True)
     lock_fd = _kunci_profil(profile_dir)
@@ -142,6 +173,7 @@ def attach(viewport=(1500, 950), user_agent=CHROME_UA, locale="id-ID"):
 def chromium_exe() -> str:
     from playwright.sync_api import sync_playwright
 
+    pastikan_chromium()
     with sync_playwright() as p:
         return p.chromium.executable_path
 

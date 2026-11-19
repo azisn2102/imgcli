@@ -331,6 +331,7 @@ def _build_parser() -> argparse.ArgumentParser:
             "  imgcli \"a red apple, photorealistic\"\n"
             "  imgcli \"neon city\" --ar 16:9 -n 3 -o out/\n"
             "  imgcli login                       # sign in once (free Google account)\n"
+            "  imgcli setup                       # download chromium (once)\n"
             "  imgcli \"robot\" --api -m gemini-2.5-flash-image\n"
         ),
     )
@@ -405,6 +406,26 @@ def _run_browser(args) -> int:
     return 0
 
 
+def _build_setup_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(
+        prog="imgcli setup",
+        description="Pastikan chromium Playwright terunduh (unduh otomatis bila belum).",
+    )
+    return p
+
+
+def _run_setup(args) -> int:
+    from . import browser
+
+    try:
+        exe = browser.pastikan_chromium()
+    except Exception as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    print(f"chromium siap: {exe}")
+    return 0
+
+
 def _build_tanya_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="imgcli tanya",
@@ -453,6 +474,10 @@ def main(argv=None) -> int:
     if argv and argv[0] == "browser":
         args = _build_browser_parser().parse_args(argv[1:])
         return _run_browser(args)
+
+    if argv and argv[0] == "setup":
+        args = _build_setup_parser().parse_args(argv[1:])
+        return _run_setup(args)
 
     if argv and argv[0] == "tanya":
         args = _build_tanya_parser().parse_args(argv[1:])

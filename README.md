@@ -17,15 +17,25 @@ Two backends, one interface:
 
 ## Install
 
-Requires **Python ≥ 3.11**.
+**One line** (Linux/macOS, needs Python ≥ 3.11):
 
 ```bash
-# recommended: isolated install straight from GitHub
-pipx install git+https://github.com/azisn2102/imgcli.git
-playwright install chromium   # one-time browser download
+curl -fsSL https://raw.githubusercontent.com/azisn2102/imgcli/main/install.sh | bash
+```
 
-# or with pip
-pip install git+https://github.com/azisn2102/imgcli.git
+The installer finds a suitable Python, installs `imgcli` (via `pipx` if
+available, else `pip --user`) and pre-downloads Chromium. After it finishes:
+
+```bash
+imgcli login    # sign in to Google once (free web mode)
+imgcli "a red apple, photorealistic"
+```
+
+**Manual install:**
+
+```bash
+pipx install git+https://github.com/azisn2102/imgcli.git   # or: pip install git+...
+imgcli setup    # downloads Chromium (once; also automatic on first web use)
 ```
 
 From a clone:
@@ -34,8 +44,11 @@ From a clone:
 git clone https://github.com/azisn2102/imgcli.git
 cd imgcli
 pip install -e .
-playwright install chromium   # one-time browser download
+imgcli setup
 ```
+
+Chromium is downloaded automatically the first time a browser is needed —
+`imgcli setup` just does it up front. `--api` mode needs no browser at all.
 
 ## Login once (free web mode)
 
@@ -132,6 +145,7 @@ src/imgcli/
     flow.py         flow.google.com via Playwright
     api.py          Gemini REST API
 keepalive.sh        session-refresh daemon for headless servers
+install.sh          one-line installer (curl | bash)
 tests/              offline tests (no API calls)
 ```
 
